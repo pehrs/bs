@@ -37,6 +37,7 @@ type searchModel struct {
 	totalItems     int
 	fetchingMore   bool
 	sortOrder      sortOrder
+	sortReverse    bool
 	width          int
 	height         int
 	err            error
@@ -138,7 +139,7 @@ func (m searchModel) update(msg tea.Msg) (searchModel, tea.Cmd) {
 		for i, e := range msg.entities {
 			newItems[i] = entityItem{entity: e}
 		}
-		sorted := sortItems(append(existing, newItems...), m.sortOrder)
+		sorted := sortItems(append(existing, newItems...), m.sortOrder, m.sortReverse)
 		setCmd := m.list.SetItems(sorted)
 		if msg.nextCursor != "" {
 			m.fetchingMore = true
@@ -221,7 +222,13 @@ func (m searchModel) update(msg tea.Msg) (searchModel, tea.Cmd) {
 		case "s":
 			if m.state == searchResults {
 				m.sortOrder = (m.sortOrder + 1) % numSortOrders
-				sorted := sortItems(m.list.Items(), m.sortOrder)
+				sorted := sortItems(m.list.Items(), m.sortOrder, m.sortReverse)
+				return m, m.list.SetItems(sorted)
+			}
+		case "S":
+			if m.state == searchResults {
+				m.sortReverse = !m.sortReverse
+				sorted := sortItems(m.list.Items(), m.sortOrder, m.sortReverse)
 				return m, m.list.SetItems(sorted)
 			}
 		}
@@ -280,7 +287,11 @@ func (m searchModel) viewInput() string {
 
 func (m searchModel) viewResults() string {
 	count := fmt.Sprintf("%d", m.totalItems)
-	sortLabel := sortIndicatorStyle.Render("  sort:" + sortOrderLabels[m.sortOrder])
+	dir := "↑"
+	if m.sortReverse {
+		dir = "↓"
+	}
+	sortLabel := sortIndicatorStyle.Render("  sort:" + sortOrderLabels[m.sortOrder] + dir)
 	header := headerStyle.Render("Search: \""+m.term+"\"  "+count+" results") + sortLabel
 
 	var body string
@@ -293,7 +304,7 @@ func (m searchModel) viewResults() string {
 		body = m.list.View()
 	}
 
-	helpText := "↑/↓: navigate  enter: details  /: filter  s: sort  r: re-search  esc: back  q: quit"
+	helpText := "↑/↓: navigate  enter: details  /: filter  s: sort field  S: reverse  r: re-search  esc: back  q: quit"
 	var bottomLine string
 	if m.fetchingMore {
 		bottomLine = m.spin.View() + " " + helpStyle.Render("loading more…  "+helpText)

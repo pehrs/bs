@@ -47,3 +47,7 @@ curl -s -X GET \
 Add suport for filtering and sorting in all the resulting lists.
 
 ---
+
+Add support for reverse sorting by using capital letter S.
+
+---

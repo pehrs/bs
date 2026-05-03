@@ -52,6 +52,7 @@ type listAllModel struct {
 	totalItems     int
 	fetchingMore   bool
 	sortOrder      sortOrder
+	sortReverse    bool
 	width          int
 	height         int
 	err            error
@@ -145,7 +146,7 @@ func (m listAllModel) update(msg tea.Msg) (listAllModel, tea.Cmd) {
 		for i, e := range msg.entities {
 			newItems[i] = entityItem{entity: e}
 		}
-		sorted := sortItems(append(existing, newItems...), m.sortOrder)
+		sorted := sortItems(append(existing, newItems...), m.sortOrder, m.sortReverse)
 		setCmd := m.list.SetItems(sorted)
 		if msg.nextCursor != "" {
 			m.fetchingMore = true
@@ -243,7 +244,14 @@ func (m listAllModel) update(msg tea.Msg) (listAllModel, tea.Cmd) {
 		case "s":
 			if m.state == listAllList {
 				m.sortOrder = (m.sortOrder + 1) % numSortOrders
-				sorted := sortItems(m.list.Items(), m.sortOrder)
+				sorted := sortItems(m.list.Items(), m.sortOrder, m.sortReverse)
+				return m, m.list.SetItems(sorted)
+			}
+
+		case "S":
+			if m.state == listAllList {
+				m.sortReverse = !m.sortReverse
+				sorted := sortItems(m.list.Items(), m.sortOrder, m.sortReverse)
 				return m, m.list.SetItems(sorted)
 			}
 		}
@@ -280,8 +288,12 @@ func (m listAllModel) view() string {
 
 	case listAllList:
 		tabs := renderKindTabs(m.kindIdx)
-		sortLabel := sortIndicatorStyle.Render("  sort:" + sortOrderLabels[m.sortOrder])
-		helpText := "↑/↓: navigate  enter: details  tab/shift+tab: kind  /: filter  s: sort  r: refresh  esc: menu  q: quit"
+		dir := "↑"
+		if m.sortReverse {
+			dir = "↓"
+		}
+		sortLabel := sortIndicatorStyle.Render("  sort:" + sortOrderLabels[m.sortOrder] + dir)
+		helpText := "↑/↓: navigate  enter: details  tab/shift+tab: kind  /: filter  s: sort field  S: reverse  r: refresh  esc: menu  q: quit"
 		var bottomLine string
 		if m.fetchingMore {
 			bottomLine = m.spin.View() + " " + helpStyle.Render("loading more…  "+helpText)
