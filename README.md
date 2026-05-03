@@ -4,6 +4,7 @@
 
 This project was slowly curated together with Claude code over a few sessions with small [incremental prompts](instructions.md) and some corrections by me.
 
+![Sample-Video](docs/bs.gif)
 
 ## Setup Backstage for bs access
 
