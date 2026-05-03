@@ -21,6 +21,13 @@ type searchPageMsg struct {
 	term       string // used to discard stale results if the term changed
 }
 
+type querySearchPageMsg struct {
+	results    []globalSearchResult
+	totalItems int
+	nextCursor string
+	term       string
+}
+
 // viewTechDocsMsg is sent by a detail sub-screen to launch the TechDocs viewer.
 type viewTechDocsMsg struct{ entity Entity }
 

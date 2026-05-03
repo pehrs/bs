@@ -15,6 +15,7 @@ type screenState int
 
 const (
 	screenMenu screenState = iota
+	screenGlobalSearch
 	screenSearch
 	screenListAll
 	screenTechDocs
@@ -26,6 +27,7 @@ type mainMenuEntry struct {
 }
 
 var mainMenuEntries = []mainMenuEntry{
+	{"Search", "full-text search across all Backstage content"},
 	{"Search Catalog", "full-text search across entity names and titles"},
 	{"List Catalog Entities", "browse catalog entities by kind"},
 }
@@ -33,23 +35,25 @@ var mainMenuEntries = []mainMenuEntry{
 // ── App model ─────────────────────────────────────────────────────────────────
 
 type appModel struct {
-	screen     screenState
-	prevScreen screenState
-	menuIdx    int
-	listAll    listAllModel
-	search     searchModel
-	techdocs   techdocsModel
-	width      int
-	height     int
-	client     backstageClient
+	screen       screenState
+	prevScreen   screenState
+	menuIdx      int
+	globalSearch globalSearchModel
+	listAll      listAllModel
+	search       searchModel
+	techdocs     techdocsModel
+	width        int
+	height       int
+	client       backstageClient
 }
 
 func newAppModel(client backstageClient) appModel {
 	return appModel{
-		screen:  screenMenu,
-		listAll: newListAllModel(client, 0, 0),
-		search:  newSearchModel(client, 0, 0),
-		client:  client,
+		screen:       screenMenu,
+		globalSearch: newGlobalSearchModel(client, 0, 0),
+		listAll:      newListAllModel(client, 0, 0),
+		search:       newSearchModel(client, 0, 0),
+		client:       client,
 	}
 }
 
@@ -63,6 +67,7 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		m.globalSearch, _ = m.globalSearch.update(msg)
 		m.listAll, _ = m.listAll.update(msg)
 		m.search, _ = m.search.update(msg)
 		return m, nil
@@ -91,6 +96,10 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch m.screen {
 	case screenMenu:
 		return m.updateMenu(msg)
+	case screenGlobalSearch:
+		var cmd tea.Cmd
+		m.globalSearch, cmd = m.globalSearch.update(msg)
+		return m, cmd
 	case screenListAll:
 		var cmd tea.Cmd
 		m.listAll, cmd = m.listAll.update(msg)
@@ -127,9 +136,12 @@ func (m appModel) updateMenu(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case "enter":
 		switch m.menuIdx {
 		case 0:
+			m.globalSearch = newGlobalSearchModel(m.client, m.width, m.height)
+			m.screen = screenGlobalSearch
+		case 1:
 			m.search = newSearchModel(m.client, m.width, m.height)
 			m.screen = screenSearch
-		case 1:
+		case 2:
 			m.listAll = newListAllModel(m.client, m.width, m.height)
 			m.screen = screenListAll
 		}
@@ -141,6 +153,8 @@ func (m appModel) View() string {
 	switch m.screen {
 	case screenMenu:
 		return renderMainMenu(m.menuIdx, m.width, m.height)
+	case screenGlobalSearch:
+		return m.globalSearch.view()
 	case screenListAll:
 		return m.listAll.view()
 	case screenSearch:

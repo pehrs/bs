@@ -1,5 +1,4 @@
-please do not make mistakes and do not lie.
-please verify the code you write works.
+---
 
 please create an interactive command line user interface (tui) in golang that can list and show details of catalog entities from a backstage backend server
 
@@ -71,5 +70,19 @@ Make techdocs page rendering markdown to work like a proper browser that follows
 ---
 
 The techdocs markdown rendering is really slow compared to running glow directly. please fix the performance issue.  please explain the reason for the performance issue.
+
+---
+
+Add a toplevel page that does generic search. Here's an example of what the search url looks like using curl: 
+```shell
+ACCESS_TOKEN=should-be-secret
+SEARCH_TERM="service"
+
+curl -s -X GET \
+     -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+     "http://localhost:7007/api/search/query?term=${SEARCH_TERM}"
+```
+
+The file bs-search-sample-response.json shows what the response looks like.
 
 ---

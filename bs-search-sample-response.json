@@ -1,0 +1,584 @@
+{
+  "numberOfResults": 35,
+  "nextPageCursor": "MQ==",
+  "results": [
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "sample-project",
+        "text": "A simple backstage sample project",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-backend",
+        "location": "/catalog/default/component/sample-project"
+      },
+      "rank": 1,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "title": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project",
+          "text": "A <e7b326c5-05f8-4811-8cf2-17daf79f94d7>simple</e7b326c5-05f8-4811-8cf2-17daf79f94d7> backstage <e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7> project",
+          "location": "/catalog/default/component/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project"
+        }
+      }
+    },
+    {
+      "type": "techdocs",
+      "document": {
+        "kind": "component",
+        "namespace": "default",
+        "annotations": {
+          "backstage.io/managed-by-location": "file:/home/matti/src/control-booth/backstage/examples/sample-project/catalog-info.yaml",
+          "backstage.io/managed-by-origin-location": "file:/home/matti/src/control-booth/backstage/examples/sample-project/catalog-info.yaml",
+          "backstage.io/techdocs-ref": "dir:."
+        },
+        "name": "sample-project",
+        "title": "Home",
+        "text": "This is the index file for sample-project",
+        "componentType": "service",
+        "type": "service",
+        "lifecycle": "production",
+        "owner": "team-backend",
+        "path": "",
+        "location": "/docs/default/component/sample-project/"
+      },
+      "rank": 2,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "name": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project",
+          "text": "This is the index file for <e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project",
+          "location": "/docs/default/component/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project/"
+        }
+      }
+    },
+    {
+      "type": "techdocs",
+      "document": {
+        "kind": "component",
+        "namespace": "default",
+        "annotations": {
+          "backstage.io/managed-by-location": "file:/home/matti/src/control-booth/backstage/examples/sample-project/catalog-info.yaml",
+          "backstage.io/managed-by-origin-location": "file:/home/matti/src/control-booth/backstage/examples/sample-project/catalog-info.yaml",
+          "backstage.io/techdocs-ref": "dir:."
+        },
+        "name": "sample-project",
+        "title": "Getting Started",
+        "text": "This is how to get started with the sample-project",
+        "componentType": "service",
+        "type": "service",
+        "lifecycle": "production",
+        "owner": "team-backend",
+        "path": "getting-started/",
+        "location": "/docs/default/component/sample-project/getting-started/"
+      },
+      "rank": 3,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "name": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project",
+          "text": "This is how to get started with the <e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project",
+          "location": "/docs/default/component/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sample</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-project/getting-started/"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "Samuel Powell",
+        "text": "Samuel Powell : samuel.powell@acme-corp.example.com",
+        "componentType": "other",
+        "type": "other",
+        "namespace": "default",
+        "kind": "User",
+        "lifecycle": "",
+        "owner": "",
+        "location": "/catalog/default/user/samuel-powell"
+      },
+      "rank": 4,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "title": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Powell",
+          "text": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Powell : <e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>.powell@acme-corp.example.com",
+          "location": "/catalog/default/user/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-powell"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "Samuel Barnes",
+        "text": "Samuel Barnes : samuel.barnes@acme-corp.example.com",
+        "componentType": "other",
+        "type": "other",
+        "namespace": "default",
+        "kind": "User",
+        "lifecycle": "",
+        "owner": "",
+        "location": "/catalog/default/user/samuel-barnes"
+      },
+      "rank": 5,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "title": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Barnes",
+          "text": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Barnes : <e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>.barnes@acme-corp.example.com",
+          "location": "/catalog/default/user/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-barnes"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "Samuel Jenkins",
+        "text": "Samuel Jenkins : samuel.jenkins@acme-corp.example.com",
+        "componentType": "other",
+        "type": "other",
+        "namespace": "default",
+        "kind": "User",
+        "lifecycle": "",
+        "owner": "",
+        "location": "/catalog/default/user/samuel-jenkins"
+      },
+      "rank": 6,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "title": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Jenkins",
+          "text": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Jenkins : <e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>.jenkins@acme-corp.example.com",
+          "location": "/catalog/default/user/<e7b326c5-05f8-4811-8cf2-17daf79f94d7>samuel</e7b326c5-05f8-4811-8cf2-17daf79f94d7>-jenkins"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "Sales",
+        "text": "Sales team",
+        "componentType": "team",
+        "type": "team",
+        "namespace": "default",
+        "kind": "Group",
+        "lifecycle": "",
+        "owner": "",
+        "location": "/catalog/default/group/team-sales"
+      },
+      "rank": 7,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "title": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+          "text": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>Sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7> team",
+          "location": "/catalog/default/group/team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "Example Node.js Template",
+        "text": "An example template for the scaffolder that creates a simple Node.js service",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Template",
+        "lifecycle": "",
+        "owner": "user:guest",
+        "location": "/catalog/default/template/example-nodejs-template"
+      },
+      "rank": 8,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "text": "An example template for the scaffolder that creates a <e7b326c5-05f8-4811-8cf2-17daf79f94d7>simple</e7b326c5-05f8-4811-8cf2-17daf79f94d7> Node.js service"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Ingestion Svc API",
+        "text": "GRPC API provided by crm-system-ingestion-svc",
+        "componentType": "grpc",
+        "type": "grpc",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-ingestion-svc-api"
+      },
+      "rank": 9,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Migration Svc API",
+        "text": "GRAPHQL API provided by crm-system-migration-svc",
+        "componentType": "graphql",
+        "type": "graphql",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-migration-svc-api"
+      },
+      "rank": 10,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Migration Svc",
+        "text": "Migration Svc component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-migration-svc"
+      },
+      "rank": 11,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Audit Svc API",
+        "text": "OPENAPI API provided by crm-system-audit-svc",
+        "componentType": "openapi",
+        "type": "openapi",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "experimental",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-audit-svc-api"
+      },
+      "rank": 12,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Audit Svc",
+        "text": "Audit Svc component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "experimental",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-audit-svc"
+      },
+      "rank": 13,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Ingestion Svc",
+        "text": "Ingestion Svc component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-ingestion-svc"
+      },
+      "rank": 14,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Notifier API",
+        "text": "GRPC API provided by crm-system-notifier",
+        "componentType": "grpc",
+        "type": "grpc",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-notifier-api"
+      },
+      "rank": 15,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Config Svc API",
+        "text": "OPENAPI API provided by crm-system-config-svc",
+        "componentType": "openapi",
+        "type": "openapi",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-config-svc-api"
+      },
+      "rank": 16,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Admin Ui API",
+        "text": "OPENAPI API provided by crm-system-admin-ui",
+        "componentType": "openapi",
+        "type": "openapi",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-admin-ui-api"
+      },
+      "rank": 17,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Worker API",
+        "text": "ASYNCAPI API provided by crm-system-worker",
+        "componentType": "asyncapi",
+        "type": "asyncapi",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-worker-api"
+      },
+      "rank": 18,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Core Svc",
+        "text": "Core Svc component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-core-svc"
+      },
+      "rank": 19,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Worker",
+        "text": "Worker component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-worker"
+      },
+      "rank": 20,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Core Svc API",
+        "text": "GRAPHQL API provided by crm-system-core-svc",
+        "componentType": "graphql",
+        "type": "graphql",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-core-svc-api"
+      },
+      "rank": 21,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Notifier",
+        "text": "Notifier component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "production",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-notifier"
+      },
+      "rank": 22,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Gateway API",
+        "text": "OPENAPI API provided by crm-system-gateway",
+        "componentType": "openapi",
+        "type": "openapi",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "deprecated",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-gateway-api"
+      },
+      "rank": 23,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Processor API",
+        "text": "GRAPHQL API provided by crm-system-processor",
+        "componentType": "graphql",
+        "type": "graphql",
+        "namespace": "default",
+        "kind": "API",
+        "lifecycle": "experimental",
+        "owner": "team-sales",
+        "location": "/catalog/default/api/crm-system-processor-api"
+      },
+      "rank": 24,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    },
+    {
+      "type": "software-catalog",
+      "document": {
+        "title": "CRM System Processor",
+        "text": "Processor component of the CRM System system",
+        "componentType": "service",
+        "type": "service",
+        "namespace": "default",
+        "kind": "Component",
+        "lifecycle": "experimental",
+        "owner": "team-sales",
+        "location": "/catalog/default/component/crm-system-processor"
+      },
+      "rank": 25,
+      "highlight": {
+        "preTag": "<e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "postTag": "</e7b326c5-05f8-4811-8cf2-17daf79f94d7>",
+        "fields": {
+          "owner": "team-<e7b326c5-05f8-4811-8cf2-17daf79f94d7>sales</e7b326c5-05f8-4811-8cf2-17daf79f94d7>"
+        }
+      }
+    }
+  ]
+}
