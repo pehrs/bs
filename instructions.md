@@ -63,3 +63,8 @@ Here are some references to backstage:
 ---
 
 the current implementation fails to get the markdown for techdocs if the annotation backstage.io/managed-by-origin-location starts with file://. please fix this.
+
+---
+
+Make techdocs page rendering markdown to work like a proper browser that follows markdown links and renders them correctly as described by this page: https://backstage.io/docs/features/techdocs/how-to-guides/
+

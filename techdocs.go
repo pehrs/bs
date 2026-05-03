@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -13,6 +14,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
+	"github.com/charmbracelet/lipgloss"
 	"gopkg.in/yaml.v3"
 )
 
@@ -39,21 +41,35 @@ func (n navEntry) Title() string       { return n.title }
 func (n navEntry) Description() string { return n.file }
 func (n navEntry) FilterValue() string { return n.title }
 
+// ── History ───────────────────────────────────────────────────────────────────
+
+type historyEntry struct {
+	file     string
+	rendered string // rendered markdown content (for restoring without re-fetch)
+	links    []navEntry
+}
+
 // ── Model ─────────────────────────────────────────────────────────────────────
 
 type techdocsModel struct {
-	state     techdocsState
-	entity    Entity
-	baseURL   string // raw-content base URL with trailing slash
-	docsDir   string // docs_dir from mkdocs.yml (default "docs")
-	nav       []navEntry
-	navList   list.Model
-	vp        viewport.Model
-	spin      spinner.Model
-	pageTitle string
-	width     int
-	height    int
-	err       error
+	state           techdocsState
+	entity          Entity
+	baseURL         string // raw-content base URL with trailing slash
+	docsDir         string // docs_dir from mkdocs.yml (default "docs")
+	nav             []navEntry
+	navList         list.Model
+	vp              viewport.Model
+	spin            spinner.Model
+	pageTitle       string
+	currentFile     string       // file path of the currently displayed page
+	renderedContent string       // rendered markdown stored for history
+	pageLinks       []navEntry   // internal links extracted from the current page
+	linkList        list.Model   // list view for in-page links
+	showLinks       bool         // whether the link-selection panel is active
+	pageHistory     []historyEntry
+	width           int
+	height          int
+	err             error
 }
 
 // ── Messages ──────────────────────────────────────────────────────────────────
@@ -64,8 +80,8 @@ type techDocsMkdocsLoadedMsg struct {
 }
 
 type techDocsPageLoadedMsg struct {
-	title   string
-	content string
+	file    string // relative to docsDir
+	content string // raw markdown
 }
 
 // ── Constructor ───────────────────────────────────────────────────────────────
@@ -75,18 +91,24 @@ func newTechdocsModel(entity Entity, width, height int) (techdocsModel, tea.Cmd)
 	sp.Spinner = spinner.Dot
 	sp.Style = spinnerStyle
 
-	delegate := list.NewDefaultDelegate()
-	l := list.New([]list.Item{}, delegate, width, max(0, height-2))
-	l.SetShowTitle(false)
-	l.SetShowHelp(false)
-	l.SetFilteringEnabled(false)
+	makeList := func() list.Model {
+		delegate := list.NewDefaultDelegate()
+		delegate.Styles.SelectedTitle = delegate.Styles.SelectedTitle.
+			BorderLeftForeground(lipgloss.Color("#0079C6"))
+		l := list.New([]list.Item{}, delegate, width, max(0, height-2))
+		l.SetShowTitle(false)
+		l.SetShowHelp(false)
+		l.SetFilteringEnabled(false)
+		return l
+	}
 
 	vp := viewport.New(width, max(0, height-2))
 
 	m := techdocsModel{
 		entity:  entity,
 		docsDir: "docs",
-		navList: l,
+		navList: makeList(),
+		linkList: makeList(),
 		vp:      vp,
 		spin:    sp,
 		width:   width,
@@ -124,7 +146,7 @@ func doFetchTechDocsPage(baseURL, docsDir, file string) tea.Cmd {
 		if err != nil {
 			return errMsg{err}
 		}
-		return techDocsPageLoadedMsg{title: file, content: content}
+		return techDocsPageLoadedMsg{file: file, content: content}
 	}
 }
 
@@ -206,6 +228,56 @@ func flattenNav(node interface{}, prefix string) []navEntry {
 	return nil
 }
 
+// ── Link extraction ───────────────────────────────────────────────────────────
+
+var mdLinkRe = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
+
+// extractInternalLinks parses inline markdown links from raw markdown and
+// returns navEntries for links that resolve to .md files within the same site.
+// currentFile is relative to docsDir (e.g. "guide/setup.md").
+func extractInternalLinks(markdown, currentFile string) []navEntry {
+	dir := path.Dir(currentFile)
+	seen := map[string]bool{}
+	var out []navEntry
+
+	for _, m := range mdLinkRe.FindAllStringSubmatch(markdown, -1) {
+		text := m[1]
+		href := m[2]
+
+		// Skip external URLs and bare anchors.
+		if strings.HasPrefix(href, "http://") || strings.HasPrefix(href, "https://") ||
+			strings.HasPrefix(href, "mailto:") || strings.HasPrefix(href, "#") {
+			continue
+		}
+
+		// Strip anchor fragment.
+		if idx := strings.Index(href, "#"); idx >= 0 {
+			href = href[:idx]
+		}
+		if href == "" {
+			continue
+		}
+
+		// Resolve relative to the current page's directory.
+		resolved := path.Join(dir, href)
+
+		// Normalise to a .md path.
+		switch {
+		case strings.HasSuffix(resolved, "/") || !strings.Contains(path.Base(resolved), "."):
+			resolved = strings.TrimSuffix(resolved, "/") + "/index.md"
+		case !strings.HasSuffix(resolved, ".md"):
+			continue // skip non-markdown links (images, PDFs, …)
+		}
+
+		if seen[resolved] {
+			continue
+		}
+		seen[resolved] = true
+		out = append(out, navEntry{title: text, file: resolved})
+	}
+	return out
+}
+
 // ── URL helpers ───────────────────────────────────────────────────────────────
 
 // deriveTechDocsBaseURL resolves the raw-content base URL for an entity's
@@ -228,8 +300,8 @@ func deriveTechDocsBaseURL(entity Entity) (string, error) {
 		switch {
 		case strings.HasPrefix(origin, "url:"):
 			rawOrigin = toRawGitHubURL(strings.TrimPrefix(origin, "url:"))
-		case strings.HasPrefix(origin, "file:/"): // The BS response does not have the double slashes.
-			rawOrigin = origin // keep the file:/ prefix intact
+		case strings.HasPrefix(origin, "file:"): // Backstage may emit file:/ or file:// or file:///
+			rawOrigin = origin
 		default:
 			return "", fmt.Errorf("unsupported origin location type: %q", origin)
 		}
@@ -262,11 +334,18 @@ func toRawGitHubURL(u string) string {
 	return u
 }
 
-// httpGet fetches a URL (http/https or file://) and returns the body as a string.
+// httpGet fetches a URL (http/https or any file: variant) and returns the body.
+// file: URL forms handled: file:///path  file://path  file:/path  file:path
 func httpGet(rawURL string) (string, error) {
-	if strings.HasPrefix(rawURL, "file://") {
-		localPath := strings.TrimPrefix(rawURL, "file://")
-		data, err := os.ReadFile(localPath)
+	if strings.HasPrefix(rawURL, "file:") {
+		// Strip "file:" then strip at most two leading slashes so that
+		// file:///abs, file://abs, file:/abs all yield /abs (absolute path)
+		// and file:rel yields rel (relative path).
+		p := rawURL[5:] // after "file:"
+		if strings.HasPrefix(p, "//") {
+			p = p[2:] // strip authority prefix; for file:///path this leaves /path
+		}
+		data, err := os.ReadFile(p)
 		if err != nil {
 			return "", err
 		}
@@ -305,6 +384,7 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		m.vp.Width = msg.Width
 		m.vp.Height = max(0, msg.Height-2)
 		m.navList.SetSize(msg.Width, max(0, msg.Height-2))
+		m.linkList.SetSize(msg.Width, max(0, msg.Height-2))
 		return m, nil
 
 	case spinner.TickMsg:
@@ -331,11 +411,22 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		if err != nil {
 			rendered = msg.content
 		}
-		m.pageTitle = msg.title
+		links := extractInternalLinks(msg.content, msg.file)
+		linkItems := make([]list.Item, len(links))
+		for i, e := range links {
+			linkItems[i] = e
+		}
+
+		m.currentFile = msg.file
+		m.pageTitle = msg.file
+		m.renderedContent = rendered
+		m.pageLinks = links
+		m.showLinks = false
 		m.vp.SetContent(rendered)
 		m.vp.GotoTop()
+		cmd := m.linkList.SetItems(linkItems)
 		m.state = techdocsPage
-		return m, nil
+		return m, cmd
 
 	case errMsg:
 		m.err = msg.err
@@ -350,6 +441,13 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		case "esc":
 			switch m.state {
 			case techdocsPage:
+				if m.showLinks {
+					m.showLinks = false
+					return m, nil
+				}
+				if len(m.pageHistory) > 0 {
+					return m.popHistory()
+				}
 				m.state = techdocsNav
 				return m, nil
 			case techdocsNav, techdocsError:
@@ -359,10 +457,26 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		case "enter":
 			if m.state == techdocsNav {
 				if item, ok := m.navList.SelectedItem().(navEntry); ok {
+					m.pageHistory = nil // fresh navigation from the nav clears history
 					m.state = techdocsLoadingPage
 					return m, tea.Batch(m.spin.Tick,
 						doFetchTechDocsPage(m.baseURL, m.docsDir, item.file))
 				}
+			}
+			if m.state == techdocsPage && m.showLinks {
+				if item, ok := m.linkList.SelectedItem().(navEntry); ok {
+					m.pushHistory()
+					m.showLinks = false
+					m.state = techdocsLoadingPage
+					return m, tea.Batch(m.spin.Tick,
+						doFetchTechDocsPage(m.baseURL, m.docsDir, item.file))
+				}
+			}
+
+		case "l":
+			if m.state == techdocsPage && !m.showLinks && len(m.pageLinks) > 0 {
+				m.showLinks = true
+				return m, nil
 			}
 		}
 	}
@@ -373,12 +487,48 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		m.navList, cmd = m.navList.Update(msg)
 		return m, cmd
 	case techdocsPage:
+		if m.showLinks {
+			var cmd tea.Cmd
+			m.linkList, cmd = m.linkList.Update(msg)
+			return m, cmd
+		}
 		var cmd tea.Cmd
 		m.vp, cmd = m.vp.Update(msg)
 		return m, cmd
 	}
 
 	return m, nil
+}
+
+// pushHistory saves the current page state onto the history stack.
+func (m *techdocsModel) pushHistory() {
+	m.pageHistory = append(m.pageHistory, historyEntry{
+		file:     m.currentFile,
+		rendered: m.renderedContent,
+		links:    m.pageLinks,
+	})
+}
+
+// popHistory restores the previous page from the history stack without re-fetching.
+func (m techdocsModel) popHistory() (techdocsModel, tea.Cmd) {
+	entry := m.pageHistory[len(m.pageHistory)-1]
+	m.pageHistory = m.pageHistory[:len(m.pageHistory)-1]
+
+	m.currentFile = entry.file
+	m.pageTitle = entry.file
+	m.renderedContent = entry.rendered
+	m.pageLinks = entry.links
+	m.showLinks = false
+
+	items := make([]list.Item, len(entry.links))
+	for i, e := range entry.links {
+		items[i] = e
+	}
+	m.vp.SetContent(entry.rendered)
+	m.vp.GotoTop()
+	cmd := m.linkList.SetItems(items)
+	m.state = techdocsPage
+	return m, cmd
 }
 
 // ── View ──────────────────────────────────────────────────────────────────────
@@ -399,7 +549,22 @@ func (m techdocsModel) view() string {
 		return title + "\n" + m.navList.View() + "\n" + help
 	case techdocsPage:
 		title := headerStyle.Render("TechDocs: " + name + "  " + m.pageTitle)
-		help := helpStyle.Render("↑/↓/pgup/pgdn: scroll  esc: nav  q: quit")
+		if m.showLinks {
+			help := helpStyle.Render("↑/↓: navigate  enter: follow link  esc: cancel  q: quit")
+			return title + "\n" + m.linkList.View() + "\n" + help
+		}
+		var parts []string
+		parts = append(parts, "↑/↓/pgup/pgdn: scroll")
+		if len(m.pageLinks) > 0 {
+			parts = append(parts, "l: links")
+		}
+		if len(m.pageHistory) > 0 {
+			parts = append(parts, "esc: back")
+		} else {
+			parts = append(parts, "esc: nav")
+		}
+		parts = append(parts, "q: quit")
+		help := helpStyle.Render(strings.Join(parts, "  "))
 		return title + "\n" + m.vp.View() + "\n" + help
 	}
 	return ""
@@ -421,3 +586,4 @@ func renderMarkdown(content string, width int) (string, error) {
 	}
 	return r.Render(content)
 }
+
