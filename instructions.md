@@ -68,3 +68,8 @@ the current implementation fails to get the markdown for techdocs if the annotat
 
 Make techdocs page rendering markdown to work like a proper browser that follows markdown links and renders them correctly as described by this page: https://backstage.io/docs/features/techdocs/how-to-guides/
 
+---
+
+The techdocs markdown rendering is really slow compared to running glow directly. please fix the performance issue.  please explain the reason for the performance issue.
+
+---

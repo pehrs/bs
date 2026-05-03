@@ -76,7 +76,7 @@ func (c backstageClient) searchEntities(term, cursor string) ([]Entity, int, str
 	params := url.Values{}
 	params.Set("limit", "200")
 	params.Set("fullTextFilterTerm", term)
-	params.Set("fullTextFilterFields", "metadata.name,metadata.title")
+	params.Set("fullTextFilterFields", "metadata.name,metadata.title,metadata.description")
 	if cursor != "" {
 		params.Set("cursor", cursor)
 	}

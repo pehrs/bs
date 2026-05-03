@@ -9,13 +9,14 @@ import (
 type sortOrder int
 
 const (
-	sortByName      sortOrder = iota
+	sortByName sortOrder = iota
+	sortByDescription
 	sortByKind
 	sortByNamespace
 	numSortOrders
 )
 
-var sortOrderLabels = [numSortOrders]string{"name", "kind", "namespace"}
+var sortOrderLabels = [numSortOrders]string{"name", "description", "kind", "namespace"}
 
 // sortItems returns a sorted copy of items; original slice is not modified.
 // When reverse is true the order is descending.
@@ -30,6 +31,12 @@ func sortItems(items []list.Item, order sortOrder, reverse bool) []list.Item {
 		case sortByKind:
 			if a.Kind != b.Kind {
 				less = a.Kind < b.Kind
+			} else {
+				less = a.Metadata.Name < b.Metadata.Name
+			}
+		case sortByDescription:
+			if a.Metadata.Description != b.Metadata.Description {
+				less = a.Metadata.Description < b.Metadata.Description
 			} else {
 				less = a.Metadata.Name < b.Metadata.Name
 			}

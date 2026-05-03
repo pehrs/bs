@@ -15,8 +15,8 @@ type screenState int
 
 const (
 	screenMenu screenState = iota
-	screenListAll
 	screenSearch
+	screenListAll
 	screenTechDocs
 )
 
@@ -26,8 +26,8 @@ type mainMenuEntry struct {
 }
 
 var mainMenuEntries = []mainMenuEntry{
+	{"Search Catalog", "full-text search across entity names and titles"},
 	{"List Catalog Entities", "browse catalog entities by kind"},
-	{"Search Catalog",        "full-text search across entity names and titles"},
 }
 
 // ── App model ─────────────────────────────────────────────────────────────────
@@ -127,11 +127,11 @@ func (m appModel) updateMenu(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case "enter":
 		switch m.menuIdx {
 		case 0:
-			m.listAll = newListAllModel(m.client, m.width, m.height)
-			m.screen = screenListAll
-		case 1:
 			m.search = newSearchModel(m.client, m.width, m.height)
 			m.screen = screenSearch
+		case 1:
+			m.listAll = newListAllModel(m.client, m.width, m.height)
+			m.screen = screenListAll
 		}
 	}
 	return m, nil
