@@ -10,3 +10,6 @@ type pageLoadedMsg struct {
 }
 
 type errMsg struct{ err error }
+
+// backToMenuMsg is returned by a sub-screen when the user wants to go up to the main menu.
+type backToMenuMsg struct{}

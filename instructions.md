@@ -20,3 +20,13 @@ The definition of Backstage catalog entities can be found on this page: https://
 ---
 
 Change the main.go implementation so that the main menu when starting the application does not call the backend directly but the user first can choose the type of entities to view.
+
+---
+
+Change the main.go implementation to support pagination of the backstage responses as described on this page: https://backstage.io/docs/features/software-catalog/software-catalog-api/
+
+---
+
+change the implementation and move the current top level menu to its own file called listall.go and make a new top level menu that can naviagte to that. 
+
+
