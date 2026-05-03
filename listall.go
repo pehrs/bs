@@ -254,6 +254,12 @@ func (m listAllModel) update(msg tea.Msg) (listAllModel, tea.Cmd) {
 				sorted := sortItems(m.list.Items(), m.sortOrder, m.sortReverse)
 				return m, m.list.SetItems(sorted)
 			}
+
+		case "t":
+			if m.state == listAllDetail && m.selectedEntity != nil && hasTechDocs(*m.selectedEntity) {
+				e := *m.selectedEntity
+				return m, func() tea.Msg { return viewTechDocsMsg{entity: e} }
+			}
 		}
 	}
 
@@ -307,7 +313,11 @@ func (m listAllModel) view() string {
 			return ""
 		}
 		title := headerStyle.Render(m.selectedEntity.Kind + "  " + m.selectedEntity.Metadata.Name)
-		help := helpStyle.Render("↑/↓/pgup/pgdn: scroll  esc: back  q: quit")
+		helpText := "↑/↓/pgup/pgdn: scroll  esc: back  q: quit"
+		if hasTechDocs(*m.selectedEntity) {
+			helpText = "↑/↓/pgup/pgdn: scroll  t: techdocs  esc: back  q: quit"
+		}
+		help := helpStyle.Render(helpText)
 		return title + "\n" + m.vp.View() + "\n" + help
 	}
 	return ""

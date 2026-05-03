@@ -51,3 +51,15 @@ Add suport for filtering and sorting in all the resulting lists.
 Add support for reverse sorting by using capital letter S.
 
 ---
+
+On the detailed page for an entity if the entity has an annotation called 'backstage.io/techdocs-ref' then add function to render the markdown techdocs for the component using the golang glow library (https://github.com/charmbracelet/glow).
+
+Use the backstage.io annotations to figure out where to read the markdown files from. You should be able to use the backstage.io/managed-by-origin-location and/or backstage.io/techdocs-ref annotations to figure out where the mkdocs.yml file should be read from.
+
+Here are some references to backstage:
+- https://backstage.io/docs/features/software-catalog/well-known-annotations/
+- https://backstage.io/docs/features/techdocs/creating-and-publishing/
+
+---
+
+the current implementation fails to get the markdown for techdocs if the annotation backstage.io/managed-by-origin-location starts with file://. please fix this.

@@ -17,6 +17,7 @@ const (
 	screenMenu screenState = iota
 	screenListAll
 	screenSearch
+	screenTechDocs
 )
 
 type mainMenuEntry struct {
@@ -32,13 +33,15 @@ var mainMenuEntries = []mainMenuEntry{
 // ── App model ─────────────────────────────────────────────────────────────────
 
 type appModel struct {
-	screen  screenState
-	menuIdx int
-	listAll listAllModel
-	search  searchModel
-	width   int
-	height  int
-	client  backstageClient
+	screen     screenState
+	prevScreen screenState
+	menuIdx    int
+	listAll    listAllModel
+	search     searchModel
+	techdocs   techdocsModel
+	width      int
+	height     int
+	client     backstageClient
 }
 
 func newAppModel(client backstageClient) appModel {
@@ -68,6 +71,17 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.screen = screenMenu
 		return m, nil
 
+	case backToPrevMsg:
+		m.screen = m.prevScreen
+		return m, nil
+
+	case viewTechDocsMsg:
+		m.prevScreen = m.screen
+		var cmd tea.Cmd
+		m.techdocs, cmd = newTechdocsModel(msg.entity, m.width, m.height)
+		m.screen = screenTechDocs
+		return m, cmd
+
 	case tea.KeyMsg:
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
@@ -84,6 +98,10 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenSearch:
 		var cmd tea.Cmd
 		m.search, cmd = m.search.update(msg)
+		return m, cmd
+	case screenTechDocs:
+		var cmd tea.Cmd
+		m.techdocs, cmd = m.techdocs.update(msg)
 		return m, cmd
 	}
 
@@ -127,6 +145,8 @@ func (m appModel) View() string {
 		return m.listAll.view()
 	case screenSearch:
 		return m.search.view()
+	case screenTechDocs:
+		return m.techdocs.view()
 	}
 	return ""
 }

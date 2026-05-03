@@ -20,3 +20,9 @@ type searchPageMsg struct {
 	nextCursor string
 	term       string // used to discard stale results if the term changed
 }
+
+// viewTechDocsMsg is sent by a detail sub-screen to launch the TechDocs viewer.
+type viewTechDocsMsg struct{ entity Entity }
+
+// backToPrevMsg is sent by the TechDocs viewer to return to the previous screen.
+type backToPrevMsg struct{}
