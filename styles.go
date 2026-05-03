@@ -64,4 +64,7 @@ var (
 
 	spinnerStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#FF79C6"))
+
+	sortIndicatorStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#BD93F9"))
 )

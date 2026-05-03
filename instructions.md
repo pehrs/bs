@@ -41,3 +41,9 @@ curl -s -X GET \
      -H "Authorization: Bearer ${ACCESS_TOKEN}" \
      "http://localhost:7007/api/catalog/entities/by-query?fullTextFilterTerm=${SEARCH_TERM}&fullTextFilterFields=metadata.name,metadata.title"
 ```
+
+---
+
+Add suport for filtering and sorting in all the resulting lists.
+
+---

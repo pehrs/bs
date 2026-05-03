@@ -36,6 +36,7 @@ type searchModel struct {
 	term           string // term used for the current result set
 	totalItems     int
 	fetchingMore   bool
+	sortOrder      sortOrder
 	width          int
 	height         int
 	err            error
@@ -65,7 +66,7 @@ func newSearchModel(client backstageClient, width, height int) searchModel {
 	l.SetShowTitle(false)
 	l.SetShowHelp(false)
 	l.SetShowStatusBar(true)
-	l.SetFilteringEnabled(false) // search is handled server-side
+	l.SetFilteringEnabled(true) // client-side filter on top of server results
 
 	vp := viewport.New(width, max(0, height-2))
 
@@ -137,7 +138,8 @@ func (m searchModel) update(msg tea.Msg) (searchModel, tea.Cmd) {
 		for i, e := range msg.entities {
 			newItems[i] = entityItem{entity: e}
 		}
-		setCmd := m.list.SetItems(append(existing, newItems...))
+		sorted := sortItems(append(existing, newItems...), m.sortOrder)
+		setCmd := m.list.SetItems(sorted)
 		if msg.nextCursor != "" {
 			m.fetchingMore = true
 			m.state = searchResults
@@ -176,6 +178,13 @@ func (m searchModel) update(msg tea.Msg) (searchModel, tea.Cmd) {
 			return m, cmd
 		}
 
+		// While the results list filter input is active, pass everything to the list.
+		if m.state == searchResults && m.list.FilterState() == list.Filtering {
+			var cmd tea.Cmd
+			m.list, cmd = m.list.Update(msg)
+			return m, cmd
+		}
+
 		// All other states: q quits, esc navigates back.
 		switch msg.String() {
 		case "q":
@@ -208,6 +217,13 @@ func (m searchModel) update(msg tea.Msg) (searchModel, tea.Cmd) {
 				_ = m.list.SetItems([]list.Item{})
 				return m, tea.Batch(m.spin.Tick, m.doSearch())
 			}
+
+		case "s":
+			if m.state == searchResults {
+				m.sortOrder = (m.sortOrder + 1) % numSortOrders
+				sorted := sortItems(m.list.Items(), m.sortOrder)
+				return m, m.list.SetItems(sorted)
+			}
 		}
 	}
 
@@ -233,7 +249,7 @@ func (m searchModel) view() string {
 	case searchInput:
 		return m.viewInput()
 	case searchLoading:
-		return "\n  " + m.spin.View() + "  Searching for “" + m.term + "”…"
+		return "\n  " + m.spin.View() + "  Searching for \"" + m.term + "\"…"
 	case searchResults:
 		return m.viewResults()
 	case searchDetail:
@@ -264,12 +280,12 @@ func (m searchModel) viewInput() string {
 
 func (m searchModel) viewResults() string {
 	count := fmt.Sprintf("%d", m.totalItems)
-	header := headerStyle.Render("Search: “" + m.term + "”  " + count + " results")
+	sortLabel := sortIndicatorStyle.Render("  sort:" + sortOrderLabels[m.sortOrder])
+	header := headerStyle.Render("Search: \""+m.term+"\"  "+count+" results") + sortLabel
 
 	var body string
 	if len(m.list.Items()) == 0 && !m.fetchingMore {
 		body = "\n\n  " + helpStyle.Render("No results found.")
-		// pad remaining height
 		for i := 3; i < m.height-2; i++ {
 			body += "\n"
 		}
@@ -277,7 +293,7 @@ func (m searchModel) viewResults() string {
 		body = m.list.View()
 	}
 
-	helpText := "↑/↓: navigate  enter: details  r: re-search  esc: back to search  q: quit"
+	helpText := "↑/↓: navigate  enter: details  /: filter  s: sort  r: re-search  esc: back  q: quit"
 	var bottomLine string
 	if m.fetchingMore {
 		bottomLine = m.spin.View() + " " + helpStyle.Render("loading more…  "+helpText)
