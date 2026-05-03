@@ -198,6 +198,9 @@ func main() {
 		token = os.Getenv("BACKSTAGE_TOKEN")
 	}
 
+	// Probe the terminal before bubbletea takes over stdin/stdout.
+	initGlamourStyle()
+
 	p := tea.NewProgram(
 		newAppModel(newBackstageClient(baseURL, token)),
 		tea.WithAltScreen(),

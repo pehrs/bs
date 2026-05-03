@@ -15,8 +15,28 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 	"gopkg.in/yaml.v3"
 )
+
+// glamourStyle is detected once before bubbletea starts (see initGlamourStyle).
+var glamourStyle = "dark"
+
+// initGlamourStyle probes the terminal background colour and caches the
+// appropriate glamour style name. It MUST be called before tea.NewProgram —
+// termenv queries stdin/stdout directly, which conflicts with bubbletea's
+// input loop and causes multi-hundred-millisecond timeouts if called later.
+func initGlamourStyle() {
+	if s := os.Getenv("GLAMOUR_STYLE"); s != "" {
+		glamourStyle = s
+		return
+	}
+	if termenv.NewOutput(os.Stdout).HasDarkBackground() {
+		glamourStyle = "dark"
+	} else {
+		glamourStyle = "light"
+	}
+}
 
 // ── States ────────────────────────────────────────────────────────────────────
 
@@ -578,7 +598,7 @@ func renderMarkdown(content string, width int) (string, error) {
 		ww = 20
 	}
 	r, err := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
+		glamour.WithStandardStyle(glamourStyle),
 		glamour.WithWordWrap(ww),
 	)
 	if err != nil {
