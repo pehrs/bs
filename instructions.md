@@ -17,3 +17,6 @@ curl -s -X GET \
      
 The definition of Backstage catalog entities can be found on this page: https://backstage.io/docs/features/software-catalog/descriptor-format
 
+---
+
+Change the main.go implementation so that the main menu when starting the application does not call the backend directly but the user first can choose the type of entities to view.

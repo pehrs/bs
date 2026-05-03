@@ -141,6 +141,26 @@ func (i entityItem) FilterValue() string {
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 var (
+	menuTitleStyle = lipgloss.NewStyle().
+			Bold(true).
+			Foreground(lipgloss.Color("#FFFDF5")).
+			Background(lipgloss.Color("#25A065")).
+			Padding(0, 1).
+			MarginBottom(1)
+
+	menuSelectedStyle = lipgloss.NewStyle().
+				Bold(true).
+				Foreground(lipgloss.Color("#282A36")).
+				Background(lipgloss.Color("#FF79C6")).
+				Padding(0, 1)
+
+	menuNormalStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F8F8F2")).
+			Padding(0, 1)
+
+	menuDescStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#6272A4"))
+
 	headerStyle = lipgloss.NewStyle().
 			Bold(true).
 			Foreground(lipgloss.Color("#FFFDF5")).
@@ -187,7 +207,8 @@ var (
 type viewState int
 
 const (
-	viewLoading viewState = iota
+	viewKindSelect viewState = iota
+	viewLoading
 	viewList
 	viewDetail
 	viewError
@@ -196,6 +217,19 @@ const (
 var allKinds = []string{
 	"All", "Component", "API", "User", "Group",
 	"Resource", "System", "Domain", "Template", "Location",
+}
+
+var kindDescs = map[string]string{
+	"All":       "browse all entity kinds",
+	"Component": "services, websites, libraries, etc.",
+	"API":       "API definitions (OpenAPI, gRPC, GraphQL…)",
+	"User":      "user accounts",
+	"Group":     "teams and organisational units",
+	"Resource":  "databases, queues, buckets, etc.",
+	"System":    "collections of related entities",
+	"Domain":    "groups of systems",
+	"Template":  "Scaffolder templates",
+	"Location":  "entity source file locations",
 }
 
 type model struct {
@@ -234,7 +268,7 @@ func newModel(client backstageClient) model {
 	vp := viewport.New(0, 0)
 
 	return model{
-		state:  viewLoading,
+		state:  viewKindSelect,
 		list:   l,
 		vp:     vp,
 		spin:   sp,
@@ -245,7 +279,7 @@ func newModel(client backstageClient) model {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.spin.Tick, m.doFetch())
+	return nil
 }
 
 func (m model) doFetch() tea.Cmd {
@@ -316,12 +350,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "esc":
-			if m.state == viewDetail {
+			switch m.state {
+			case viewDetail:
 				m.state = viewList
+				return m, nil
+			case viewList, viewError:
+				m.state = viewKindSelect
+				return m, nil
+			}
+
+		case "up", "k":
+			if m.state == viewKindSelect {
+				m.kindIdx = (m.kindIdx - 1 + len(allKinds)) % len(allKinds)
+				return m, nil
+			}
+
+		case "down", "j":
+			if m.state == viewKindSelect {
+				m.kindIdx = (m.kindIdx + 1) % len(allKinds)
 				return m, nil
 			}
 
 		case "enter":
+			if m.state == viewKindSelect {
+				m.state = viewLoading
+				return m, tea.Batch(m.spin.Tick, m.doFetch())
+			}
 			if m.state == viewList {
 				if item, ok := m.list.SelectedItem().(entityItem); ok {
 					e := item.entity
@@ -334,14 +388,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "tab":
-			if m.state == viewList || m.state == viewError {
+			if m.state == viewList {
 				m.kindIdx = (m.kindIdx + 1) % len(allKinds)
 				m.state = viewLoading
 				return m, tea.Batch(m.spin.Tick, m.doFetch())
 			}
 
 		case "shift+tab":
-			if m.state == viewList || m.state == viewError {
+			if m.state == viewList {
 				m.kindIdx = (m.kindIdx - 1 + len(allKinds)) % len(allKinds)
 				m.state = viewLoading
 				return m, tea.Batch(m.spin.Tick, m.doFetch())
@@ -374,12 +428,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	switch m.state {
+	case viewKindSelect:
+		return renderKindMenu(m.kindIdx, m.width, m.height)
+
 	case viewLoading:
 		return "\n  " + m.spin.View() + "  Loading " + allKinds[m.kindIdx] + " entities…"
 
 	case viewError:
 		tabs := renderKindTabs(m.kindIdx)
-		help := helpStyle.Render("tab: change kind  q: quit")
+		help := helpStyle.Render("esc: back  q: quit")
 		return tabs + "\n\n  " + errorStyle.Render("Error: "+m.err.Error()) + "\n\n  " + help
 
 	case viewList:
@@ -398,6 +455,38 @@ func (m model) View() string {
 		return title + "\n" + m.vp.View() + "\n" + help
 	}
 	return ""
+}
+
+func renderKindMenu(activeIdx, _, height int) string {
+	var sb strings.Builder
+	sb.WriteString(menuTitleStyle.Render("Backstage Catalog Browser"))
+	sb.WriteString("\n\n")
+	sb.WriteString("  Select entity kind:\n\n")
+
+	for i, kind := range allKinds {
+		cursor := "  "
+		if i == activeIdx {
+			cursor = "▶ "
+			sb.WriteString("  ")
+			sb.WriteString(menuSelectedStyle.Render(cursor+kind))
+		} else {
+			sb.WriteString("  ")
+			sb.WriteString(menuNormalStyle.Render(cursor+kind))
+		}
+		desc := kindDescs[kind]
+		sb.WriteString("  ")
+		sb.WriteString(menuDescStyle.Render(desc))
+		sb.WriteString("\n")
+	}
+
+	// pad to push help to bottom if terminal is tall enough
+	used := 4 + len(allKinds) + 2
+	for i := used; i < height-1; i++ {
+		sb.WriteString("\n")
+	}
+	sb.WriteString("  ")
+	sb.WriteString(helpStyle.Render("↑/↓: navigate  enter: select  q: quit"))
+	return sb.String()
 }
 
 func renderKindTabs(activeIdx int) string {
