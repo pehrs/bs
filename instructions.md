@@ -29,4 +29,15 @@ Change the main.go implementation to support pagination of the backstage respons
 
 change the implementation and move the current top level menu to its own file called listall.go and make a new top level menu that can naviagte to that. 
 
+---
 
+create a new top level page that searches backstage for entities and presents the result.
+Here's an example on how to search backstage with curl:
+```shell
+ACCESS_TOKEN=should-be-secret
+SEARCH_TERM="service"
+
+curl -s -X GET \
+     -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+     "http://localhost:7007/api/catalog/entities/by-query?fullTextFilterTerm=${SEARCH_TERM}&fullTextFilterFields=metadata.name,metadata.title"
+```

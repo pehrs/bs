@@ -16,6 +16,7 @@ type screenState int
 const (
 	screenMenu screenState = iota
 	screenListAll
+	screenSearch
 )
 
 type mainMenuEntry struct {
@@ -24,7 +25,8 @@ type mainMenuEntry struct {
 }
 
 var mainMenuEntries = []mainMenuEntry{
-	{"List Catalog Entities", "browse and search catalog entities by kind"},
+	{"List Catalog Entities", "browse catalog entities by kind"},
+	{"Search Catalog",        "full-text search across entity names and titles"},
 }
 
 // ── App model ─────────────────────────────────────────────────────────────────
@@ -33,6 +35,7 @@ type appModel struct {
 	screen  screenState
 	menuIdx int
 	listAll listAllModel
+	search  searchModel
 	width   int
 	height  int
 	client  backstageClient
@@ -42,6 +45,7 @@ func newAppModel(client backstageClient) appModel {
 	return appModel{
 		screen:  screenMenu,
 		listAll: newListAllModel(client, 0, 0),
+		search:  newSearchModel(client, 0, 0),
 		client:  client,
 	}
 }
@@ -56,8 +60,8 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		// Always propagate to listAll so dimensions are correct when entering it.
 		m.listAll, _ = m.listAll.update(msg)
+		m.search, _ = m.search.update(msg)
 		return m, nil
 
 	case backToMenuMsg:
@@ -76,6 +80,10 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case screenListAll:
 		var cmd tea.Cmd
 		m.listAll, cmd = m.listAll.update(msg)
+		return m, cmd
+	case screenSearch:
+		var cmd tea.Cmd
+		m.search, cmd = m.search.update(msg)
 		return m, cmd
 	}
 
@@ -103,6 +111,9 @@ func (m appModel) updateMenu(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case 0:
 			m.listAll = newListAllModel(m.client, m.width, m.height)
 			m.screen = screenListAll
+		case 1:
+			m.search = newSearchModel(m.client, m.width, m.height)
+			m.screen = screenSearch
 		}
 	}
 	return m, nil
@@ -114,6 +125,8 @@ func (m appModel) View() string {
 		return renderMainMenu(m.menuIdx, m.width, m.height)
 	case screenListAll:
 		return m.listAll.view()
+	case screenSearch:
+		return m.search.view()
 	}
 	return ""
 }
