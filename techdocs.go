@@ -76,6 +76,7 @@ type techdocsModel struct {
 	entity          Entity
 	baseURL         string // raw-content base URL with trailing slash
 	docsDir         string // docs_dir from mkdocs.yml (default "docs")
+	startFile       string // if set, open this page directly after loading nav
 	nav             []navEntry
 	navList         list.Model
 	vp              viewport.Model
@@ -106,7 +107,7 @@ type techDocsPageLoadedMsg struct {
 
 // ── Constructor ───────────────────────────────────────────────────────────────
 
-func newTechdocsModel(entity Entity, width, height int) (techdocsModel, tea.Cmd) {
+func newTechdocsModel(entity Entity, startFile string, width, height int) (techdocsModel, tea.Cmd) {
 	sp := spinner.New()
 	sp.Spinner = spinner.Dot
 	sp.Style = spinnerStyle
@@ -125,14 +126,15 @@ func newTechdocsModel(entity Entity, width, height int) (techdocsModel, tea.Cmd)
 	vp := viewport.New(width, max(0, height-2))
 
 	m := techdocsModel{
-		entity:  entity,
-		docsDir: "docs",
-		navList: makeList(),
-		linkList: makeList(),
-		vp:      vp,
-		spin:    sp,
-		width:   width,
-		height:  height,
+		entity:    entity,
+		docsDir:   "docs",
+		startFile: startFile,
+		navList:   makeList(),
+		linkList:  makeList(),
+		vp:        vp,
+		spin:      sp,
+		width:     width,
+		height:    height,
 	}
 
 	baseURL, err := deriveTechDocsBaseURL(entity)
@@ -393,6 +395,19 @@ func hasTechDocs(e Entity) bool {
 		e.Metadata.Annotations["backstage.io/techdocs-ref"] != ""
 }
 
+// entityFromSearchDoc constructs a minimal Entity from a globalSearchDoc,
+// carrying enough annotation data for deriveTechDocsBaseURL.
+func entityFromSearchDoc(doc globalSearchDoc) Entity {
+	return Entity{
+		Kind: doc.Kind,
+		Metadata: EntityMetadata{
+			Name:        doc.Name,
+			Namespace:   doc.Namespace,
+			Annotations: doc.Annotations,
+		},
+	}
+}
+
 // ── Update ────────────────────────────────────────────────────────────────────
 
 func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
@@ -422,9 +437,14 @@ func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
 		for i, e := range msg.nav {
 			items[i] = e
 		}
-		cmd := m.navList.SetItems(items)
+		setCmd := m.navList.SetItems(items)
+		if m.startFile != "" {
+			m.state = techdocsLoadingPage
+			return m, tea.Batch(setCmd, m.spin.Tick,
+				doFetchTechDocsPage(m.baseURL, m.docsDir, m.startFile))
+		}
 		m.state = techdocsNav
-		return m, cmd
+		return m, setCmd
 
 	case techDocsPageLoadedMsg:
 		rendered, err := renderMarkdown(msg.content, m.width)

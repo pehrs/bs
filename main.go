@@ -83,7 +83,7 @@ func (m appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case viewTechDocsMsg:
 		m.prevScreen = m.screen
 		var cmd tea.Cmd
-		m.techdocs, cmd = newTechdocsModel(msg.entity, m.width, m.height)
+		m.techdocs, cmd = newTechdocsModel(msg.entity, msg.startFile, m.width, m.height)
 		m.screen = screenTechDocs
 		return m, cmd
 

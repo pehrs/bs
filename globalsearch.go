@@ -15,15 +15,15 @@ import (
 // ── API types ─────────────────────────────────────────────────────────────────
 
 type globalSearchDoc struct {
-	Title         string            `json:"title"`
-	Text          string            `json:"text"`
-	ComponentType string            `json:"componentType"`
-	Type          string            `json:"type"`
-	Namespace     string            `json:"namespace"`
-	Kind          string            `json:"kind"`
-	Lifecycle     string            `json:"lifecycle"`
-	Owner         string            `json:"owner"`
-	Location      string            `json:"location"`
+	Title         string `json:"title"`
+	Text          string `json:"text"`
+	ComponentType string `json:"componentType"`
+	Type          string `json:"type"`
+	Namespace     string `json:"namespace"`
+	Kind          string `json:"kind"`
+	Lifecycle     string `json:"lifecycle"`
+	Owner         string `json:"owner"`
+	Location      string `json:"location"`
 	// TechDocs-only fields
 	Name        string            `json:"name"`
 	Path        string            `json:"path"`
@@ -50,8 +50,8 @@ type globalSearchItem struct {
 
 func (g globalSearchItem) Title() string {
 	doc := g.result.Document
-	// For TechDocs results show "entityname: page title" so the entity is always visible.
-	if g.result.Type == "techdocs" && doc.Name != "" {
+	// For results that have TechDocs (identified by annotation) show "entityname: page title".
+	if globalResultHasTechDocs(doc) && doc.Name != "" {
 		pageTitle := doc.Title
 		if pageTitle == "" {
 			pageTitle = doc.Path
@@ -79,8 +79,13 @@ func (g globalSearchItem) Description() string {
 
 	parts := []string{g.result.Type, kindLabel}
 
-	if g.result.Type == "techdocs" && doc.Path != "" {
-		parts = append(parts, doc.Path)
+	if globalResultHasTechDocs(doc) {
+		if ref := doc.Annotations["backstage.io/techdocs-ref"]; ref != "" {
+			parts = append(parts, ref)
+		}
+		if doc.Path != "" {
+			parts = append(parts, doc.Path)
+		}
 	} else if doc.Owner != "" {
 		parts = append(parts, "owner:"+doc.Owner)
 	}
@@ -95,6 +100,12 @@ func (g globalSearchItem) Description() string {
 	return strings.Join(parts, "  ")
 }
 
+// globalResultHasTechDocs mirrors hasTechDocs for Entity: it uses the
+// backstage.io/techdocs-ref annotation as the sole signal, regardless of result type.
+func globalResultHasTechDocs(doc globalSearchDoc) bool {
+	return doc.Annotations != nil && doc.Annotations["backstage.io/techdocs-ref"] != ""
+}
+
 func (g globalSearchItem) FilterValue() string {
 	doc := g.result.Document
 	return g.result.Type + " " + doc.Title + " " + doc.Name + " " + doc.Text
@@ -105,7 +116,7 @@ func (g globalSearchItem) FilterValue() string {
 type globalSearchState int
 
 const (
-	gsInput   globalSearchState = iota
+	gsInput globalSearchState = iota
 	gsLoading
 	gsResults
 	gsDetail
@@ -286,6 +297,16 @@ func (m globalSearchModel) update(msg tea.Msg) (globalSearchModel, tea.Cmd) {
 				m.input.Focus()
 				return m, nil
 			}
+		case "t":
+			if m.state == gsDetail && m.selectedResult != nil &&
+				globalResultHasTechDocs(m.selectedResult.Document) {
+				doc := m.selectedResult.Document
+				entity := entityFromSearchDoc(doc)
+				return m, func() tea.Msg {
+					// FIXME: Figure out how to open the correct document here...
+					return viewTechDocsMsg{entity: entity, startFile: ""}
+				}
+			}
 		case "enter":
 			if m.state == gsResults {
 				if item, ok := m.list.SelectedItem().(globalSearchItem); ok {
@@ -405,7 +426,12 @@ func (m globalSearchModel) viewDetail() string {
 		title = doc.Location
 	}
 	header := headerStyle.Render(m.selectedResult.Type + "  " + title)
-	help := helpStyle.Render("↑/↓/pgup/pgdn: scroll  esc: back  q: quit")
+	helpParts := []string{"↑/↓/pgup/pgdn: scroll"}
+	if globalResultHasTechDocs(doc) {
+		helpParts = append(helpParts, "t: open techdocs")
+	}
+	helpParts = append(helpParts, "esc: back", "q: quit")
+	help := helpStyle.Render(strings.Join(helpParts, "  "))
 	return header + "\n" + m.vp.View() + "\n" + help
 }
 

@@ -29,7 +29,11 @@ type querySearchPageMsg struct {
 }
 
 // viewTechDocsMsg is sent by a detail sub-screen to launch the TechDocs viewer.
-type viewTechDocsMsg struct{ entity Entity }
+// If startFile is non-empty the viewer opens that page directly instead of showing the nav list.
+type viewTechDocsMsg struct {
+	entity    Entity
+	startFile string
+}
 
 // backToPrevMsg is sent by the TechDocs viewer to return to the previous screen.
 type backToPrevMsg struct{}

@@ -23,14 +23,14 @@ var sortOrderLabels = [numSortOrders]string{"name", "description", "kind", "name
 type globalSortOrder int
 
 const (
-	globalSortByTitle globalSortOrder = iota // alphabetical by document title
+	globalSortByRank  globalSortOrder = iota // alphabetical by document title
 	globalSortByKind                         // by document kind, then title
 	globalSortByType                         // by result type (software-catalog, techdocs…), then title
-	globalSortByRank                         // by API relevance rank
+	globalSortByTitle                        // by API relevance rank
 	numGlobalSortOrders
 )
 
-var globalSortOrderLabels = [numGlobalSortOrders]string{"title", "kind", "type", "rank"}
+var globalSortOrderLabels = [numGlobalSortOrders]string{"rank", "title", "kind", "type"}
 
 // sortGlobalItems returns a sorted copy of globalSearchItem list items.
 func sortGlobalItems(items []list.Item, order globalSortOrder, reverse bool) []list.Item {

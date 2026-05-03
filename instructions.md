@@ -98,3 +98,12 @@ Add page and sort support for the global search screen result list, similar to t
 Add support to open the referenced techdocs markdown for global search results of the result type 'techdocs'
 
 ---
+
+in the global search response when rendering a techdoc response, please use the annotation in a similar way as the rendering that is done for the catalog search results.
+
+---
+
+please update the global result list to use the annotations in the document section of the response when rendering the techdocs.
+
+---
+
