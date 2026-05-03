@@ -15,15 +15,19 @@ import (
 // ── API types ─────────────────────────────────────────────────────────────────
 
 type globalSearchDoc struct {
-	Title         string `json:"title"`
-	Text          string `json:"text"`
-	ComponentType string `json:"componentType"`
-	Type          string `json:"type"`
-	Namespace     string `json:"namespace"`
-	Kind          string `json:"kind"`
-	Lifecycle     string `json:"lifecycle"`
-	Owner         string `json:"owner"`
-	Location      string `json:"location"`
+	Title         string            `json:"title"`
+	Text          string            `json:"text"`
+	ComponentType string            `json:"componentType"`
+	Type          string            `json:"type"`
+	Namespace     string            `json:"namespace"`
+	Kind          string            `json:"kind"`
+	Lifecycle     string            `json:"lifecycle"`
+	Owner         string            `json:"owner"`
+	Location      string            `json:"location"`
+	// TechDocs-only fields
+	Name        string            `json:"name"`
+	Path        string            `json:"path"`
+	Annotations map[string]string `json:"annotations"`
 }
 
 type globalSearchResult struct {
@@ -45,25 +49,46 @@ type globalSearchItem struct {
 }
 
 func (g globalSearchItem) Title() string {
-	if g.result.Document.Title != "" {
-		return g.result.Document.Title
+	doc := g.result.Document
+	// For TechDocs results show "entityname: page title" so the entity is always visible.
+	if g.result.Type == "techdocs" && doc.Name != "" {
+		pageTitle := doc.Title
+		if pageTitle == "" {
+			pageTitle = doc.Path
+		}
+		if pageTitle == "" {
+			pageTitle = "index"
+		}
+		return doc.Name + ": " + pageTitle
 	}
-	return g.result.Document.Location
+	if doc.Title != "" {
+		return doc.Title
+	}
+	return doc.Location
 }
 
 func (g globalSearchItem) Description() string {
 	doc := g.result.Document
-	var parts []string
-	if doc.Kind != "" {
-		parts = append(parts, doc.Kind)
+
+	// Build "Kind/type" label; skip uninformative "other" sub-type.
+	kindLabel := strings.Title(strings.ToLower(doc.Kind)) //nolint:staticcheck
+	if doc.Type != "" && doc.Type != "other" &&
+		strings.ToLower(doc.Kind) != doc.Type {
+		kindLabel += "/" + doc.Type
 	}
-	if doc.Owner != "" {
+
+	parts := []string{g.result.Type, kindLabel}
+
+	if g.result.Type == "techdocs" && doc.Path != "" {
+		parts = append(parts, doc.Path)
+	} else if doc.Owner != "" {
 		parts = append(parts, "owner:"+doc.Owner)
 	}
+
 	if doc.Text != "" {
 		t := doc.Text
-		if len(t) > 72 {
-			t = t[:69] + "…"
+		if len(t) > 60 {
+			t = t[:57] + "…"
 		}
 		parts = append(parts, t)
 	}
@@ -71,7 +96,8 @@ func (g globalSearchItem) Description() string {
 }
 
 func (g globalSearchItem) FilterValue() string {
-	return g.result.Document.Title + " " + g.result.Document.Text
+	doc := g.result.Document
+	return g.result.Type + " " + doc.Title + " " + doc.Name + " " + doc.Text
 }
 
 // ── States ────────────────────────────────────────────────────────────────────
@@ -388,17 +414,32 @@ func renderGlobalSearchDetail(r globalSearchResult) string {
 
 	section("Document")
 	field("title:         ", doc.Title)
+	if doc.Name != "" {
+		field("name:          ", doc.Name)
+	}
 	field("kind:          ", doc.Kind)
 	field("namespace:     ", doc.Namespace)
 	field("type:          ", doc.Type)
-	field("componentType: ", doc.ComponentType)
+	if doc.ComponentType != "" && doc.ComponentType != doc.Type {
+		field("componentType: ", doc.ComponentType)
+	}
 	field("owner:         ", doc.Owner)
 	field("lifecycle:     ", doc.Lifecycle)
+	if doc.Path != "" {
+		field("path:          ", doc.Path)
+	}
 
 	if doc.Text != "" {
 		section("Description")
 		sb.WriteString(fieldValueStyle.Render(doc.Text))
 		sb.WriteString("\n")
+	}
+
+	if len(doc.Annotations) > 0 {
+		section("Annotations")
+		for _, k := range sortedStringKeys(doc.Annotations) {
+			field("  "+k+": ", doc.Annotations[k])
+		}
 	}
 
 	return sb.String()

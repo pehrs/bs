@@ -86,3 +86,15 @@ curl -s -X GET \
 The file bs-search-sample-response.json shows what the response looks like.
 
 ---
+
+Add support to all result lists to show the type of entity/result
+
+---
+
+
+
+---
+
+Add support to open the referenced techdocs markdown for global search results of the result type 'techdocs'
+
+---

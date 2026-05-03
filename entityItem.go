@@ -14,7 +14,11 @@ func (i entityItem) Title() string {
 }
 
 func (i entityItem) Description() string {
-	parts := []string{i.entity.Kind}
+	kindStr := i.entity.Kind
+	if t, ok := i.entity.Spec["type"].(string); ok && t != "" && t != "other" {
+		kindStr += "/" + t
+	}
+	parts := []string{kindStr}
 	if ns := i.entity.Metadata.Namespace; ns != "" && ns != "default" {
 		parts = append(parts, ns)
 	}
