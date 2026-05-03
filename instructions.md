@@ -91,7 +91,7 @@ Add support to all result lists to show the type of entity/result
 
 ---
 
-
+Add page and sort support for the global search screen result list, similar to the entity result lists.
 
 ---
 

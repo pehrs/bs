@@ -123,6 +123,8 @@ type globalSearchModel struct {
 	term           string
 	totalItems     int
 	fetchingMore   bool
+	sortOrder      globalSortOrder
+	sortReverse    bool
 	selectedResult *globalSearchResult
 	width          int
 	height         int
@@ -225,7 +227,8 @@ func (m globalSearchModel) update(msg tea.Msg) (globalSearchModel, tea.Cmd) {
 			r := r
 			newItems[i] = globalSearchItem{result: r}
 		}
-		setCmd := m.list.SetItems(append(existing, newItems...))
+		sorted := sortGlobalItems(append(existing, newItems...), m.sortOrder, m.sortReverse)
+		setCmd := m.list.SetItems(sorted)
 		if msg.nextCursor != "" {
 			m.fetchingMore = true
 			m.state = gsResults
@@ -301,6 +304,18 @@ func (m globalSearchModel) update(msg tea.Msg) (globalSearchModel, tea.Cmd) {
 				_ = m.list.SetItems([]list.Item{})
 				return m, tea.Batch(m.spin.Tick, m.doSearch())
 			}
+		case "s":
+			if m.state == gsResults {
+				m.sortOrder = (m.sortOrder + 1) % numGlobalSortOrders
+				sorted := sortGlobalItems(m.list.Items(), m.sortOrder, m.sortReverse)
+				return m, m.list.SetItems(sorted)
+			}
+		case "S":
+			if m.state == gsResults {
+				m.sortReverse = !m.sortReverse
+				sorted := sortGlobalItems(m.list.Items(), m.sortOrder, m.sortReverse)
+				return m, m.list.SetItems(sorted)
+			}
 		}
 	}
 
@@ -353,7 +368,12 @@ func (m globalSearchModel) viewInput() string {
 }
 
 func (m globalSearchModel) viewResults() string {
-	header := headerStyle.Render(fmt.Sprintf("Search: \"%s\"  %d results", m.term, m.totalItems))
+	dir := "↑"
+	if m.sortReverse {
+		dir = "↓"
+	}
+	sortLabel := sortIndicatorStyle.Render("  sort:" + globalSortOrderLabels[m.sortOrder] + dir)
+	header := headerStyle.Render(fmt.Sprintf("Search: \"%s\"  %d results", m.term, m.totalItems)) + sortLabel
 
 	var body string
 	if len(m.list.Items()) == 0 && !m.fetchingMore {
@@ -365,7 +385,7 @@ func (m globalSearchModel) viewResults() string {
 		body = m.list.View()
 	}
 
-	helpText := "↑/↓: navigate  enter: details  /: filter  r: re-search  esc: back  q: quit"
+	helpText := "↑/↓: navigate  enter: details  /: filter  s: sort field  S: reverse  r: re-search  esc: back  q: quit"
 	var bottomLine string
 	if m.fetchingMore {
 		bottomLine = m.spin.View() + " " + helpStyle.Render("loading more…  "+helpText)
