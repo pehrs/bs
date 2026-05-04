@@ -6,6 +6,20 @@ This project was slowly curated together with Claude code over a few sessions wi
 
 ![Sample-Video](docs/bs.gif)
 
+## Install
+
+```shell
+$ go install github.com/pehrs/bs@latest
+
+$ bs --help
+Usage of /home/matti/.asdf/installs/golang/1.26.2/packages/bin/bs:
+  -token string
+        Backstage access token (default: $BACKSTAGE_TOKEN)
+  -url string
+        Backstage base URL (default: $BACKSTAGE_URL or http://localhost:7007)
+```
+
+
 ## Setup Backstage for bs access
 
 Add the following to your app-config.local.yaml
