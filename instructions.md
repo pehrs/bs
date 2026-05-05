@@ -107,3 +107,7 @@ please update the global result list to use the annotations in the document sect
 
 ---
 
+change the implementation in globalsearch.go and remove the function to show the related techdocs.
+
+---
+

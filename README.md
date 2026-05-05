@@ -2,7 +2,7 @@
 
 `bs` is a simple TUI for [backstage](https://github.com/backstage/backstage) to do quick queries and search in backstage without leaving the terminal. It's not meant as a replacement for the Backstage frontend.
 
-This project was slowly curated together with Claude code over a few sessions with small [incremental prompts](instructions.md) and some corrections by me.
+This project was slowly curated together with Claude code and Gemini CLI over a few sessions with small [incremental prompts](instructions.md) and some corrections by me.
 
 ![Sample-Video](docs/bs.gif)
 

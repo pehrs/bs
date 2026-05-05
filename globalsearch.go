@@ -50,17 +50,6 @@ type globalSearchItem struct {
 
 func (g globalSearchItem) Title() string {
 	doc := g.result.Document
-	// For results that have TechDocs (identified by annotation) show "entityname: page title".
-	if globalResultHasTechDocs(doc) && doc.Name != "" {
-		pageTitle := doc.Title
-		if pageTitle == "" {
-			pageTitle = doc.Path
-		}
-		if pageTitle == "" {
-			pageTitle = "index"
-		}
-		return doc.Name + ": " + pageTitle
-	}
 	if doc.Title != "" {
 		return doc.Title
 	}
@@ -79,14 +68,7 @@ func (g globalSearchItem) Description() string {
 
 	parts := []string{g.result.Type, kindLabel}
 
-	if globalResultHasTechDocs(doc) {
-		if ref := doc.Annotations["backstage.io/techdocs-ref"]; ref != "" {
-			parts = append(parts, ref)
-		}
-		if doc.Path != "" {
-			parts = append(parts, doc.Path)
-		}
-	} else if doc.Owner != "" {
+	if doc.Owner != "" {
 		parts = append(parts, "owner:"+doc.Owner)
 	}
 
@@ -98,12 +80,6 @@ func (g globalSearchItem) Description() string {
 		parts = append(parts, t)
 	}
 	return strings.Join(parts, "  ")
-}
-
-// globalResultHasTechDocs mirrors hasTechDocs for Entity: it uses the
-// backstage.io/techdocs-ref annotation as the sole signal, regardless of result type.
-func globalResultHasTechDocs(doc globalSearchDoc) bool {
-	return doc.Annotations != nil && doc.Annotations["backstage.io/techdocs-ref"] != ""
 }
 
 func (g globalSearchItem) FilterValue() string {
@@ -297,16 +273,6 @@ func (m globalSearchModel) update(msg tea.Msg) (globalSearchModel, tea.Cmd) {
 				m.input.Focus()
 				return m, nil
 			}
-		case "t":
-			if m.state == gsDetail && m.selectedResult != nil &&
-				globalResultHasTechDocs(m.selectedResult.Document) {
-				doc := m.selectedResult.Document
-				entity := entityFromSearchDoc(doc)
-				return m, func() tea.Msg {
-					// FIXME: Figure out how to open the correct document here...
-					return viewTechDocsMsg{entity: entity, startFile: ""}
-				}
-			}
 		case "enter":
 			if m.state == gsResults {
 				if item, ok := m.list.SelectedItem().(globalSearchItem); ok {
@@ -426,11 +392,7 @@ func (m globalSearchModel) viewDetail() string {
 		title = doc.Location
 	}
 	header := headerStyle.Render(m.selectedResult.Type + "  " + title)
-	helpParts := []string{"↑/↓/pgup/pgdn: scroll"}
-	if globalResultHasTechDocs(doc) {
-		helpParts = append(helpParts, "t: open techdocs")
-	}
-	helpParts = append(helpParts, "esc: back", "q: quit")
+	helpParts := []string{"↑/↓/pgup/pgdn: scroll", "esc: back", "q: quit"}
 	help := helpStyle.Render(strings.Join(helpParts, "  "))
 	return header + "\n" + m.vp.View() + "\n" + help
 }

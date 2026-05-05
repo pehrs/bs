@@ -395,19 +395,6 @@ func hasTechDocs(e Entity) bool {
 		e.Metadata.Annotations["backstage.io/techdocs-ref"] != ""
 }
 
-// entityFromSearchDoc constructs a minimal Entity from a globalSearchDoc,
-// carrying enough annotation data for deriveTechDocsBaseURL.
-func entityFromSearchDoc(doc globalSearchDoc) Entity {
-	return Entity{
-		Kind: doc.Kind,
-		Metadata: EntityMetadata{
-			Name:        doc.Name,
-			Namespace:   doc.Namespace,
-			Annotations: doc.Annotations,
-		},
-	}
-}
-
 // ── Update ────────────────────────────────────────────────────────────────────
 
 func (m techdocsModel) update(msg tea.Msg) (techdocsModel, tea.Cmd) {
